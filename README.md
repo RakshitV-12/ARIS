@@ -102,18 +102,24 @@ ARIS/
 │   │   ├── repository/UserRepository.java   # User persistence and lookup methods
 │   │   └── controller/AuthController.java   # POST /api/auth/login, POST /api/auth/register
 │   ├── config/                              # Configuration & Seeders
-│   │   └── DemoSeeder.java                  # Seeds Admin (rakshit) & E-Commerce / Demo projects
-│   ├── ecom/                                # Target E-Commerce Microservices
+│   │   └── DemoSeeder.java                  # Seeds Admin (rakshit) & separate E-Commerce / Demo projects
+│   ├── demo/                                # Demo Project Microservices (src/main/java/com/aris/demo)
+│   │   ├── DemoBenchmarkController.java     # /api/demo/slow & /api/demo/flaky simulation endpoints
+│   │   ├── DemoHealthController.java        # /api/health system health diagnostic endpoint
+│   │   ├── model/SystemHealthReport.java    # Diagnostic metrics report model
+│   │   └── service/                         # Telemetry jitter & connection pool simulators
+│   ├── ecom/                                # E-Commerce Microservices (src/main/java/com/aris/ecom)
 │   │   ├── OrderController.java             # /api/orders (Order processing section)
 │   │   ├── PaymentController.java           # /api/payment (Payment gateway with fault injection)
-│   │   └── ProductController.java           # /api/products (Product catalog section)
+│   │   ├── ProductController.java           # /api/products (Product catalog section)
+│   │   ├── model/                           # CustomerOrder and ProductItem domain models
+│   │   └── service/                         # Catalog, Fulfillment, and Payment Gateway services
 │   ├── incident/                            # Incident tracking & lifecycle
 │   │   ├── Incident.java                    # Incident entity (ACTIVE / RESOLVED)
 │   │   └── controller/IncidentController.java
 │   ├── monitor/                             # Monitor configurations and intervals
 │   ├── probe/                               # Telemetry & System Endpoints
 │   │   ├── DashboardController.java         # /api/dashboard (Monitors, charts, host stats)
-│   │   ├── DemoController.java              # /api/demo (Latency spike & flaky tests)
 │   │   ├── ProbeScheduler.java              # Background HTTP probe worker
 │   │   └── WorkspaceController.java         # /api/workspace (Overview, files, patching)
 │   ├── project/                             # Project ownership & metadata
@@ -198,6 +204,13 @@ Navigate to **[http://localhost:8080/](http://localhost:8080/)** in any modern w
 
 > [!TIP]
 > On the sign-in screen, click the **🔑 Quick Admin** pill to automatically fill `rakshit` / `admin123` and sign in with one click.
+
+#### 📁 Seeded Project Scope & Dedicated Files:
+
+| Project Name | Source Directory | Monitored Endpoints | Isolated Domain Files |
+| :--- | :--- | :--- | :--- |
+| **Demo Project** | `src/main/java/com/aris/demo` | `/api/health`, `/api/demo/slow`, `/api/demo/flaky` | `DemoBenchmarkController.java`, `DemoHealthController.java`, `SystemHealthReport.java`, `ConnectionPoolSimulator.java`, `SyntheticTelemetryService.java` |
+| **E-Commerce Backend** | `src/main/java/com/aris/ecom` | `/api/products`, `/api/orders`, `/api/payment` | `OrderController.java`, `PaymentController.java`, `ProductController.java`, `CustomerOrder.java`, `ProductItem.java`, `ProductCatalogService.java`, `OrderFulfillmentService.java`, `PaymentGatewayService.java` |
 
 ---
 

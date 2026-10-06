@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
+
 @Component
 public class DemoSeeder implements CommandLineRunner {
     private final UserRepository users;
@@ -33,7 +34,8 @@ public class DemoSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        String src = Path.of("src/main/java").toAbsolutePath().toString();
+        String ecomSrc = Path.of("src/main/java/com/aris/ecom").toAbsolutePath().toString();
+        String demoSrc = Path.of("src/main/java/com/aris/demo").toAbsolutePath().toString();
         String log = Path.of("logs/aris.log").toAbsolutePath().toString();
 
         // Ensure admin user 'rakshit' exists with password 'admin123'
@@ -54,8 +56,18 @@ public class DemoSeeder implements CommandLineRunner {
                 p.setOwner(adminUser);
                 changed = true;
             }
-            if (p.getSourcePath() == null || p.getSourcePath().isBlank()) {
-                p.setSourcePath(src);
+            if ("E-Commerce Backend".equalsIgnoreCase(p.getName())) {
+                if (!ecomSrc.equals(p.getSourcePath())) {
+                    p.setSourcePath(ecomSrc);
+                    changed = true;
+                }
+            } else if ("Demo Project".equalsIgnoreCase(p.getName())) {
+                if (!demoSrc.equals(p.getSourcePath())) {
+                    p.setSourcePath(demoSrc);
+                    changed = true;
+                }
+            } else if (p.getSourcePath() == null || p.getSourcePath().isBlank()) {
+                p.setSourcePath(ecomSrc);
                 changed = true;
             }
             if (p.getLogPath() == null || p.getLogPath().isBlank()) {
@@ -67,9 +79,9 @@ public class DemoSeeder implements CommandLineRunner {
 
         if (monitors.count() > 0) return;
 
-        // 1. Seed Demo Project
+        // 1. Seed Demo Project (Dedicated synthetic telemetry benchmark project)
         Project demo = new Project("Demo Project", "System health and latency benchmarks", adminUser);
-        demo.setSourcePath(src);
+        demo.setSourcePath(demoSrc);
         demo.setLogPath(log);
         Project p1 = projects.save(demo);
         Service s1 = services.save(new Service("Demo API", "Synthetic telemetry demo endpoints", "http://localhost:8080", p1));
@@ -77,9 +89,9 @@ public class DemoSeeder implements CommandLineRunner {
         monitors.save(new Monitor("Slow API", "/api/demo/slow", "GET", 5, 5, true, s1));
         monitors.save(new Monitor("Flaky API", "/api/demo/flaky", "GET", 5, 5, true, s1));
 
-        // 2. Seed E-Commerce Backend (User's production-style example)
+        // 2. Seed E-Commerce Backend (User's production-style shopping platform)
         Project ecom = new Project("E-Commerce Backend", "Production microservices: Catalog, Orders, Payments", adminUser);
-        ecom.setSourcePath(src);
+        ecom.setSourcePath(ecomSrc);
         ecom.setLogPath(log);
         Project p2 = projects.save(ecom);
         Service s2 = services.save(new Service("E-Commerce API", "Core E-Commerce shopping microservices", "http://localhost:8080", p2));
